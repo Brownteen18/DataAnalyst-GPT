@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataAnalyst-GPT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-color: #1e293b;
+            --accent-color: #3b82f6;
+            --text-color: #f8fafc;
+            --muted-color: #94a3b8;
+            --bot-bg: #2dd4bf;
+            --user-bg: #818cf8;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #111827);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+            animation: popIn 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        @keyframes popIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: rgba(51, 65, 85, 0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-bottom-left-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+        }
+
+        .input-area {
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input:focus {
+            border: 1px solid #3b82f6;
+        }
+
+        button {
+            background: linear-gradient(135deg, #3b82f6, #2dd4bf);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(45, 212, 191, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            align-self: flex-start;
+            color: var(--muted-color);
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        pre {
+            margin: 0;
+            font-family: inherit;
+        }
+
+        /* Custom Scrollbar for chat box */
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-box::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="header">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#paint0_linear)"/>
+                <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="url(#paint1_linear)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="paint0_linear" x1="12" y1="2" x2="12" y2="12" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#38BDF8"/>
+                        <stop offset="1" stop-color="#818CF8"/>
+                    </linearGradient>
+                    <linearGradient id="paint1_linear" x1="12" y1="12" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#38BDF8"/>
+                        <stop offset="1" stop-color="#818CF8"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h1>DataAnalyst-GPT</h1>
+        </div>
+        
+        <div class="chat-box" id="chat-box">
+            <div class="message bot-message">Welcome to your specialized Data Analyst model! Type a query or a code snippet below. Keep in mind: because it's a "Tiny" model, its python generations might be creative! Try things like 'def load_csv' or 'SELECT *'.</div>
+        </div>
+        
+        <div class="loading" id="loading-indicator">Generating optimal parameters...</div>
+
+        <div class="input-area">
+            <input type="text" id="prompt-input" placeholder="Enter a Python or SQL prompt..." autocomplete="off" onkeypress="handleEnter(event)">
+            <button onclick="generateText()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const inputField = document.getElementById('prompt-input');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
+        function appendMessage(text, type) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${type}-message`;
+            if (type === 'bot') {
+                msgDiv.innerHTML = `<pre>${escapeHtml(text)}</pre>`;
+            } else {
+                msgDiv.textContent = text;
+            }
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+         }
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                generateText();
+            }
+        }
+
+        async function generateText() {
+            const prompt = inputField.value.trim();
+            if (!prompt) return;
+
+            appendMessage(prompt, 'user');
+            inputField.value = '';
+            loadingIndicator.style.display = 'block';
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt, max_tokens: 100 })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    appendMessage(data.generated_text, 'bot');
+                } else {
+                    appendMessage("Error: " + (data.detail || "Something went wrong."), 'bot');
+                }
+            } catch (error) {
+                appendMessage("Failed to connect to the backend API.", 'bot');
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
