@@ -11,7 +11,7 @@ def main():
     # ~ 2-5 MB of raw text, perfect for training on a local machine to test
     subset = dataset.select(range(5000))
     
-    out_file = "input.txt"
+    out_file = os.path.join(os.path.dirname(__file__), "input.txt")
     print(f"Writing data to {out_file}...")
     
     with open(out_file, "w", encoding="utf-8") as f:

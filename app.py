@@ -12,10 +12,10 @@ app = FastAPI(title="DataAnalyst-GPT API")
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 enc = tiktoken.get_encoding("gpt2")
 
-# Model hyperparameters must match training
+# Model hyperparameters must exactly match training
 vocab_size = 50257
 n_embd = 64
-n_head = 12
+n_head = 8
 n_layer = 12
 block_size = 64
 dropout = 0.0

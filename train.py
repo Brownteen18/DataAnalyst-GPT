@@ -12,8 +12,8 @@ learning_rate = 1e-3
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 eval_iters = 50
 n_embd = 64
-n_head = 4
-n_layer = 4
+n_head = 8
+n_layer = 12
 dropout = 0.1
 
 print(f"Training on {device}...")

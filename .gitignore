@@ -1,5 +1,6 @@
 venv/
-out/
+out/*
+!out/ckpt.pt
 __pycache__/
 *.pyc
 *.bin
